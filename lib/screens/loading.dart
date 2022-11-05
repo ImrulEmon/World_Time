@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'dart:convert';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
+
+import 'package:flutter/material.dart';
+import '../services/world_time.dart';
+import 'package:http/http.dart';
 
 class Loading extends StatefulWidget {
   const Loading({super.key});
@@ -10,38 +14,35 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
-  // void getData() async {
-  //   Response response =
-  //       await get(Uri.parse('https://jsonplaceholder.typicode.com/todos/5'));
-  //   Map data = jsonDecode(response.body);
-  //   print(data);
-  //   print(data['title']);
-  // }
-
-  String url = 'http://worldtimeapi.org/api/timezone/Europe/London';
-
-  void getTime() async {
-    Response response = await get(Uri.parse(url));
-    Map data = jsonDecode(response.body);
-    String datetime = data['datetime'];
-
-    DateTime now = DateTime.parse(datetime);
-    print(now);
+  void SetupWorldTime() async {
+    WorldTime instance = WorldTime(
+        location: 'Berlin', flag: 'germany.png', url: 'Europe/Berlin');
+    await instance.getTime();
+    Navigator.pushReplacementNamed(context, '/home', arguments: {
+      'location': instance.location,
+      'flag': instance.flag,
+      'time': instance.time
+    });
   }
 
   @override
   void initState() {
     super.initState();
+    SetupWorldTime();
     //getData();
-    getTime();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 0),
-        child: Center(child: Text('Loading...')),
+      backgroundColor: Colors.grey[800],
+      body: Center(
+        child: Container(
+          child: SpinKitCircle(
+            color: Colors.white,
+            size: 90.0,
+          ),
+        ),
       ),
     );
   }
